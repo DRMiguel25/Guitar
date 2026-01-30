@@ -1,4 +1,6 @@
-export default function Header() {
+import Carrito from './Carrito'
+
+export default function Header({ cart, setCart }) {
     return (
         <header className="py-5 header">
             <div className="container-xl">
@@ -9,30 +11,7 @@ export default function Header() {
                         </a>
                     </div>
                     <nav className="col-md-6 a mt-5 d-flex align-items-start justify-content-end">
-                        <div className="carrito">
-                            <img className="img-fluid" src="/img/carrito.png" alt="imagen carrito" />
-
-                            <div id="carrito" className="bg-white p-3">
-                                <p className="text-center">El carrito esta vacio</p>
-                                <table className="w-100 table">
-                                    <thead>
-                                        <tr>
-                                            <th>Imagen</th>
-                                            <th>Nombre</th>
-                                            <th>Precio</th>
-                                            <th>Cantidad</th>
-                                            <th></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {/* Aquí irá la lógica del carrito dinámico más adelante */}
-                                    </tbody>
-                                </table>
-
-                                <p className="text-end">Total pagar: <span className="fw-bold">$0</span></p>
-                                <button className="btn btn-dark w-100 mt-3 p-2">Vaciar Carrito</button>
-                            </div>
-                        </div>
+                        <Carrito cart={cart} setCart={setCart} />
                     </nav>
                 </div>
             </div>
