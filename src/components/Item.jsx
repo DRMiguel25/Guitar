@@ -1,10 +1,5 @@
-export default function Item({ cart, carrito, setCart }) {
+export default function Item({ cart, eliminarItem, incrementarCantidad, decrementarCantidad }) {
     const { id, image, name, price, quantity } = cart
-
-    const eliminarItem = () => {
-        const carritoActualizado = carrito.filter(item => item.id !== id)
-        setCart(carritoActualizado)
-    }
 
     return (
         <tr>
@@ -18,12 +13,28 @@ export default function Item({ cart, carrito, setCart }) {
             </td>
             <td>{name}</td>
             <td className="fw-bold">${price}</td>
-            <td className="fw-bold text-center">{quantity}</td>
+            <td className="d-flex align-items-center gap-2">
+                <button
+                    type="button"
+                    className="btn btn-dark"
+                    onClick={() => decrementarCantidad(id)}
+                >
+                    -
+                </button>
+                <span className="fw-bold">{quantity}</span>
+                <button
+                    type="button"
+                    className="btn btn-dark"
+                    onClick={() => incrementarCantidad(id)}
+                >
+                    +
+                </button>
+            </td>
             <td>
                 <button
                     type="button"
                     className="btn btn-danger btn-sm"
-                    onClick={eliminarItem}
+                    onClick={() => eliminarItem(id)}
                 >
                     X
                 </button>

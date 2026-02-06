@@ -1,17 +1,15 @@
 import Item from './Item'
 
-export default function Carrito({ cart, setCart }) {
-
-    const vaciarCarrito = () => {
-        setCart([])
-    }
-
+export default function Carrito({ cart, setCart, vaciarCarrito, eliminarItem, incrementarCantidad, decrementarCantidad }) {
+    //state derivado
+    const isEmpty = cart.length === 0
+    const carTotal = () => cart.reduce((total, item) => total + (item.price * item.quantity), 0)
     return (
         <div className="carrito">
             <img className="img-fluid" src="/img/carrito.png" alt="imagen carrito" />
 
             <div id="carrito" className="bg-white p-3">
-                {cart.length === 0 ? (
+                {isEmpty ? (
                     <p className="text-center">El carrito está vacío</p>
                 ) : (
                     <>
@@ -30,8 +28,9 @@ export default function Carrito({ cart, setCart }) {
                                     <Item
                                         key={item.id}
                                         cart={item}
-                                        carrito={cart}
-                                        setCart={setCart}
+                                        eliminarItem={eliminarItem}
+                                        incrementarCantidad={incrementarCantidad}
+                                        decrementarCantidad={decrementarCantidad}
                                     />
                                 ))}
                             </tbody>
@@ -39,7 +38,7 @@ export default function Carrito({ cart, setCart }) {
 
                         <p className="text-end">
                             Total pagar: <span className="fw-bold">
-                                ${cart.reduce((total, item) => total + (item.price * item.quantity), 0)}
+                                ${carTotal()}
                             </span>
                         </p>
                         <button

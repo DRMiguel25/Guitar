@@ -1,4 +1,4 @@
-# Mi Primer Proyecto React - Tienda de Guitarras 🎸
+# Mi Primer Proyecto React - Tienda de Guitarras
 
 ## Descripción del Proyecto
 Este proyecto es una tienda de guitarras desarrollada con React. Permite visualizar una colección de guitarras y agregarlas a un carrito de compras.
@@ -196,6 +196,224 @@ src/
 ├── App.jsx           # Componente principal
 ├── App.css           # Estilos
 └── main.jsx          # Punto de entrada
+```
+
+---
+
+### 10. Operadores Ternarios para Validaciones
+Los **operadores ternarios** son una forma concisa de escribir condicionales en una sola línea. Son muy útiles para validaciones y decisiones simples.
+
+**Sintaxis:**
+```javascript
+condición ? valorSiVerdadero : valorSiFalso
+```
+
+**Ejemplo en el proyecto:**
+```jsx
+// En Card.jsx - Validación para agregar o incrementar cantidad
+const handleClick = (item) => {
+    const existeEnCarrito = cart.find(g => g.id === item.id)
+    
+    // Operador ternario: si existe incrementa, si no agrega
+    const carritoActualizado = existeEnCarrito
+        ? cart.map(g => g.id === item.id ? { ...g, quantity: g.quantity + 1 } : g)
+        : [...cart, { ...item, quantity: 1 }]
+    
+    setCart(carritoActualizado)
+}
+
+// En Header.jsx - Validación para decrementar o eliminar
+const decrementarCantidad = (id) => {
+    const itemActual = cart.find(item => item.id === id)
+    // Si cantidad > 1 decrementa, si no elimina del carrito
+    const carritoActualizado = itemActual.quantity > 1
+        ? cart.map(item => item.id === id ? { ...item, quantity: item.quantity - 1 } : item)
+        : cart.filter(item => item.id !== id)
+    setCart(carritoActualizado)
+}
+
+// En Carrito.jsx - Mostrar mensaje o contenido
+{isEmpty ? (
+    <p className="text-center">El carrito está vacío</p>
+) : (
+    <> {/* Contenido del carrito */} </>
+)}
+```
+
+**Ventajas:**
+- Código más conciso y legible
+- Menos líneas de código
+- Ideal para validaciones simples
+
+---
+
+### 11. Lifting State Up (Elevar el Estado)
+**Lifting State Up** es un patrón en React donde se mueve el estado y la lógica al componente padre más cercano que necesita compartir esos datos. Esto permite que múltiples componentes hijos compartan el mismo estado.
+
+**Implementación en el proyecto:**
+```jsx
+// Header.jsx (PADRE) - Contiene toda la lógica del carrito
+export default function Header({ cart, setCart }) {
+    const vaciarCarrito = () => setCart([])
+    
+    const eliminarItem = (id) => {
+        const carritoActualizado = cart.filter(item => item.id !== id)
+        setCart(carritoActualizado)
+    }
+    
+    const incrementarCantidad = (id) => {
+        const carritoActualizado = cart.map(item =>
+            item.id === id ? { ...item, quantity: item.quantity + 1 } : item
+        )
+        setCart(carritoActualizado)
+    }
+    
+    const decrementarCantidad = (id) => {
+        const itemActual = cart.find(item => item.id === id)
+        const carritoActualizado = itemActual.quantity > 1
+            ? cart.map(item => item.id === id ? { ...item, quantity: item.quantity - 1 } : item)
+            : cart.filter(item => item.id !== id)
+        setCart(carritoActualizado)
+    }
+    
+    return (
+        <Carrito 
+            cart={cart}
+            vaciarCarrito={vaciarCarrito}
+            eliminarItem={eliminarItem}
+            incrementarCantidad={incrementarCantidad}
+            decrementarCantidad={decrementarCantidad}
+        />
+    )
+}
+
+// Item.jsx (HIJO) - Solo recibe y ejecuta las funciones
+export default function Item({ cart, eliminarItem, incrementarCantidad, decrementarCantidad }) {
+    const { id, image, name, price, quantity } = cart
+    
+    return (
+        <button onClick={() => incrementarCantidad(id)}>+</button>
+        // Solo ejecuta la función, no maneja la lógica
+    )
+}
+```
+
+**Flujo de datos:**
+```
+Header (lógica centralizada)
+  ↓ pasa funciones como props
+Carrito (recibe y pasa)
+  ↓ pasa funciones como props
+Item (solo ejecuta)
+```
+
+**Ventajas:**
+- **Single Source of Truth**: Una sola fuente de verdad
+- **Mantenibilidad**: Cambios en un solo lugar
+- **Componentes más simples**: Hijos solo renderizan
+- **Reutilización**: Funciones compartidas entre componentes
+
+---
+
+### 12. Funcionalidad del Carrito (+, -, X)
+El carrito implementa tres funcionalidades principales mediante botones que permiten gestionar los items:
+
+**Botón "+" (Incrementar cantidad):**
+```jsx
+const incrementarCantidad = (id) => {
+    const carritoActualizado = cart.map(item =>
+        item.id === id ? { ...item, quantity: item.quantity + 1 } : item
+    )
+    setCart(carritoActualizado)
+}
+```
+- Aumenta la cantidad del producto en 1
+- Usa `map()` para encontrar el item y actualizar solo su cantidad
+- Mantiene los demás items sin cambios
+
+**Botón "-" (Decrementar cantidad):**
+```jsx
+const decrementarCantidad = (id) => {
+    const itemActual = cart.find(item => item.id === id)
+    // Si cantidad > 1 decrementa, si no elimina del carrito
+    const carritoActualizado = itemActual.quantity > 1
+        ? cart.map(item => item.id === id ? { ...item, quantity: item.quantity - 1 } : item)
+        : cart.filter(item => item.id !== id)
+    setCart(carritoActualizado)
+}
+```
+- Si la cantidad es mayor a 1: decrementa en 1
+- Si la cantidad es 1: elimina el item del carrito
+- Usa operador ternario para decidir la acción
+
+**Botón "X" (Eliminar item):**
+```jsx
+const eliminarItem = (id) => {
+    const carritoActualizado = cart.filter(item => item.id !== id)
+    setCart(carritoActualizado)
+}
+```
+- Elimina completamente el item del carrito
+- Usa `filter()` para crear un nuevo array sin el item eliminado
+
+**Implementación en Item.jsx:**
+```jsx
+<button onClick={() => decrementarCantidad(id)}>-</button>
+<span>{quantity}</span>
+<button onClick={() => incrementarCantidad(id)}>+</button>
+<button onClick={() => eliminarItem(id)}>X</button>
+```
+
+---
+
+### 13. Estados Derivados (Derived State)
+Los **estados derivados** son valores calculados a partir del estado existente. No se almacenan en un state separado, sino que se calculan en cada render.
+
+**Ejemplo en el proyecto:**
+```jsx
+// En Carrito.jsx
+export default function Carrito({ cart }) {
+    // Estados derivados - calculados a partir de 'cart'
+    const isEmpty = cart.length === 0
+    const carTotal = () => cart.reduce((total, item) => total + (item.price * item.quantity), 0)
+    
+    return (
+        <>
+            {isEmpty ? (
+                <p>El carrito está vacío</p>
+            ) : (
+                <>
+                    {/* Contenido del carrito */}
+                    <p>Total pagar: <span>${carTotal()}</span></p>
+                </>
+            )}
+        </>
+    )
+}
+```
+
+**Ventajas:**
+- **DRY (Don't Repeat Yourself)**: No repetir código
+- **Siempre actualizado**: Se recalcula en cada render
+- **Más legible**: `isEmpty` es más claro que `cart.length === 0`
+- **Mantenible**: Cambios en un solo lugar
+
+---
+
+### 14. Principio DRY (Don't Repeat Yourself)
+El principio **DRY** consiste en evitar la duplicación de código. Si tienes la misma lógica en varios lugares, debes extraerla a una función o variable reutilizable.
+
+**Ejemplo en el proyecto:**
+```jsx
+//  ANTES - Código repetido
+<p>Total: ${cart.reduce((total, item) => total + (item.price * item.quantity), 0)}</p>
+<span>${cart.reduce((total, item) => total + (item.price * item.quantity), 0)}</span>
+
+// DESPUÉS - Usando estado derivado
+const carTotal = () => cart.reduce((total, item) => total + (item.price * item.quantity), 0)
+
+<p>Total: ${carTotal()}</p>
+<span>${carTotal()}</span>
 ```
 
 ---
