@@ -22,13 +22,14 @@ export default function Card({ guitar, addToCart }) {
 }
 ```
 
-**Componentes creados:**
+**Componentes y Hooks creados:**
 - `App.jsx` - Componente principal
 - `Header.jsx` - Encabezado con logo y carrito
 - `Footer.jsx` - Pie de página
 - `Card.jsx` - Tarjeta de cada guitarra
 - `Carrito.jsx` - Carrito de compras
 - `Item.jsx` - Cada item dentro del carrito
+- `useLocalStorage.js` - Custom hook para persistencia de datos
 
 ---
 
@@ -193,6 +194,8 @@ src/
 │   └── Item.jsx      # Item del carrito
 ├── db/
 │   └── db.js         # Base de datos de guitarras
+├── hooks/
+│   └── useLocalStorage.js  # Custom hook para persistencia
 ├── App.jsx           # Componente principal
 ├── App.css           # Estilos
 └── main.jsx          # Punto de entrada
@@ -418,6 +421,64 @@ const carTotal = () => cart.reduce((total, item) => total + (item.price * item.q
 
 ---
 
+### 15. Custom Hooks y Persistencia con localStorage
+Un **Custom Hook** es una función reutilizable que encapsula lógica de React. Permite compartir lógica entre componentes sin duplicar código.
+
+**¿Qué es localStorage?**
+`localStorage` es una API del navegador que permite guardar datos de forma permanente en el navegador del usuario. Los datos persisten incluso después de cerrar el navegador.
+
+**Implementación en el proyecto:**
+```jsx
+// hooks/useLocalStorage.js - Custom Hook
+export function useLocalStorage(key, initialValue) {
+    const [storedValue, setStoredValue] = useState(() => {
+        try {
+            const item = window.localStorage.getItem(key)
+            return item ? JSON.parse(item) : initialValue
+        } catch (error) {
+            console.log('Error al leer del localStorage:', error)
+            return initialValue
+        }
+    })
+
+    const setValue = (value) => {
+        try {
+            const valueToStore = value instanceof Function ? value(storedValue) : value
+            setStoredValue(valueToStore)
+            window.localStorage.setItem(key, JSON.stringify(valueToStore))
+        } catch (error) {
+            console.log('Error al guardar en localStorage:', error)
+        }
+    }
+
+    return [storedValue, setValue]
+}
+```
+
+**Uso en App.jsx:**
+```jsx
+// ANTES - Sin persistencia
+const [cart, setCart] = useState([])
+
+// DESPUÉS - Con persistencia
+import { useLocalStorage } from './hooks/useLocalStorage'
+const [cart, setCart] = useLocalStorage('carrito-guitarras', [])
+```
+
+**¿Cómo funciona?**
+1. Al cargar la página, lee `'carrito-guitarras'` del localStorage
+2. Si existe, parsea los datos JSON y los carga en el estado
+3. Si no existe, usa el array vacío `[]` como valor inicial
+4. Cada vez que se llama a `setCart()`, guarda automáticamente en localStorage
+
+**Ventajas:**
+-**Persistencia**: Los productos del carrito se mantienen al recargar la página
+-**Reutilizable**: El hook se puede usar para otros datos
+-**Manejo de errores**: Protege contra fallos de localStorage
+-**Código limpio**: Un solo cambio activa la persistencia
+
+---
+
 ## Cómo Ejecutar el Proyecto
 ```bash
 # Instalar dependencias
@@ -430,5 +491,5 @@ npm run dev
 ---
 
 ## Autor
-Proyecto desarrollado para la materia de Sistemas Abiertos II en reactjs.
+Proyecto desarrollado  por el Miguelon, para la materia de Sistemas Abiertos II en reactjs.
 
