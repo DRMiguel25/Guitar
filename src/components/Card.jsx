@@ -9,6 +9,7 @@ export default function Card({ guitar, cart, setCart }) {
             ? cart.map(g => g.id === item.id ? { ...g, quantity: g.quantity + 1 } : g)
             : [...cart, { ...item, quantity: 1 }]
 
+        // Al actualizar el carrito, se guarda automáticamente en localStorage
         setCart(carritoActualizado)
     }
     /* const addTocart(item){

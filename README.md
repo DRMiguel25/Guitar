@@ -409,7 +409,7 @@ El principio **DRY** consiste en evitar la duplicación de código. Si tienes la
 <p>Total: ${cart.reduce((total, item) => total + (item.price * item.quantity), 0)}</p>
 <span>${cart.reduce((total, item) => total + (item.price * item.quantity), 0)}</span>
 
-// DESPUÉS - Usando estado derivado
+//  DESPUÉS - Usando estado derivado
 const carTotal = () => cart.reduce((total, item) => total + (item.price * item.quantity), 0)
 
 <p>Total: ${carTotal()}</p>

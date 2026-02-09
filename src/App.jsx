@@ -4,6 +4,7 @@ import Footer from './components/Footer'
 import Card from './components/Card'
 import { db } from '../src/db/db'
 import { useState, useEffect } from 'react'
+import { useLocalStorage } from './hooks/useLocalStorage'
 
 function App() {
 
@@ -11,7 +12,8 @@ function App() {
   const [total, setTotal] = useState(0)
   const [products, setProducts] = useState([])
   const [modal, setModal] = useState(false)
-  const [cart, setCart] = useState([])
+  // Usar useLocalStorage en lugar de useState para persistir el carrito
+  const [cart, setCart] = useLocalStorage('carrito-guitarras', [])
 
   console.log(total)
 
