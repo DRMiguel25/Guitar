@@ -2,7 +2,6 @@ import './App.css'
 import Header from './components/Header'
 import Footer from './components/Footer'
 import Card from './components/Card'
-import { db } from '../src/db/db'
 import { useState, useEffect } from 'react'
 import { useLocalStorage } from './hooks/useLocalStorage'
 
@@ -12,21 +11,27 @@ function App() {
   const [total, setTotal] = useState(0)
   const [products, setProducts] = useState([])
   const [modal, setModal] = useState(false)
-  // Usar useLocalStorage en lugar de useState para persistir el carrito
   const [cart, setCart] = useLocalStorage('carrito-guitarras', [])
 
-  console.log(total)
+  // 1. Iniciamos 'data' como un arreglo vacío. Ya no usamos 'db'.
+  const [data, setData] = useState([])
 
-  const [data, setData] = useState(db)
+  // 2. Usamos useEffect para consultar el backend en cuanto cargue la página
+  useEffect(() => {
+    const consultarAPI = async () => {
+      try {
+        const respuesta = await fetch('http://localhost:4000/Api/products')
+        const resultado = await respuesta.json()
 
-  console.log(data)
-  console.log("Carrito:", cart)
+        // El backend responde con un objeto { data: [...] }, guardamos ese arreglo
+        setData(resultado.data)
+      } catch (error) {
+        console.error("Hubo un error al conectar con el backend:", error)
+      }
+    }
 
-  const [cards, setCards] = useState([])
-
-  //useEffect(()=>{
-  //  setData(db)
-  //},[])
+    consultarAPI()
+  }, [])
 
   return (
     <div>
@@ -36,15 +41,19 @@ function App() {
         <h2 className="text-center">Nuestra Colección</h2>
 
         <div className="row mt-5">
-          {data.map(guitar => (
-            <Card
-              key={guitar.id}
-              guitar={guitar}
-              cart={cart}
-              setCart={setCart}
-            />
-          ))}
-
+          {/* 3. Validamos que haya datos antes de mapear para evitar errores */}
+          {data && data.length > 0 ? (
+            data.map(guitar => (
+              <Card
+                key={guitar.id}
+                guitar={guitar}
+                cart={cart}
+                setCart={setCart}
+              />
+            ))
+          ) : (
+            <p className="text-center">No hay guitarras disponibles en la base de datos.</p>
+          )}
         </div>
       </main>
       <Footer />

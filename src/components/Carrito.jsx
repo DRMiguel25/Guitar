@@ -7,6 +7,11 @@ export default function Carrito({ cart, setCart, vaciarCarrito, eliminarItem, in
     return (
         <div className="carrito">
             <img className="img-fluid" src="/img/carrito.png" alt="imagen carrito" />
+            {!isEmpty && (
+                <span className="position-absolute top-0 start-100 translate-middle p-2 bg-danger border border-light rounded-circle">
+                    <span className="visually-hidden">Items en el carrito</span>
+                </span>
+            )}
 
             <div id="carrito" className="bg-white p-3">
                 {isEmpty ? (
